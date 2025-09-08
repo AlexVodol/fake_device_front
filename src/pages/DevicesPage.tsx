@@ -223,6 +223,7 @@ const PassportForm = ({
     setPreviewUrl(URL.createObjectURL(file));
   };
 
+  
   const handleUploadPhoto = async () => {
     if (!selectedFile) return;
 
@@ -302,6 +303,17 @@ const PassportForm = ({
         </button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700">Name Device</label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            required
+          />
+        </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Last Name</label>
           <input
@@ -332,17 +344,6 @@ const PassportForm = ({
             value={formData.middle_name}
             onChange={handleInputChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Name</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            required
           />
         </div>
         <div>
@@ -612,6 +613,13 @@ function RegulaDevices() {
   const [showBulkDelete, setShowBulkDelete] = useState<boolean>(false);
   const { showToast } = useToast();
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(
+      () => showToast('URL has been copied to clipboard!'),
+      () => showToast('Failed to copy URL. Please copy it manually.')
+    );
+  };
+
   useEffect(() => {
     const fetchRegulas = async () => {
       try {
@@ -832,48 +840,60 @@ function RegulaDevices() {
   };
 
   return (
-    <div>
-      <div 
-        className={`bg-blue-50 p-4 mb-4 rounded-md flex justify-between items-center transition-all duration-300 transform ${
-          showBulkDelete 
-            ? 'opacity-100 translate-y-0' 
-            : 'opacity-0 -translate-y-2 h-0 py-0 mb-0 overflow-hidden'
-        }`}
-      >
-        <div className="text-blue-800 font-medium">
-          Выбрано записей: <span className="font-bold">{selectedIds.length}</span>
+    <div className="p-6">
+      {showBulkDelete && selectedIds.length > 0 && (
+        <div className="mb-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <span className="font-medium">Выбрано {selectedIds.length} устройств</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={handleCancelBulkDelete}
+                className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors duration-200"
+              >
+                Отменить выбор
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200 flex items-center space-x-1"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <span>Удалить выбранные</span>
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="space-x-2 flex-shrink-0">
-          <button
-            onClick={handleCancelBulkDelete}
-            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors duration-200"
+      )}
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Regula Devices</h1>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           >
-            Отменить выбор
-          </button>
-          <button
-            onClick={handleBulkDelete}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200 flex items-center space-x-1"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
-            <span>Удалить выбранные</span>
+            Add New
           </button>
         </div>
-      </div>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">Regula Devices</h1>
-          <p className="text-gray-600">
-            To use the device, use a URL: {window.location.protocol}//{window.location.hostname}:8000/regula/&#123;id_regula&#125;
-          </p>
+        
+        <div className="mb-4">
+          <p className="text-gray-600">To use the device, use a URL: </p>
+          <div className="flex items-center bg-gray-100 rounded overflow-hidden mt-1">
+            <code className="px-2 py-1">{window.location.protocol}//{window.location.hostname}:8000/api/v1/regula/&#123;id_regula&#125;</code>
+            <button 
+              onClick={() => copyToClipboard(`${window.location.protocol}//${window.location.hostname}:8000/api/v1/regula/{id_regula}`)}
+              className="px-2 py-1 bg-gray-200 hover:bg-gray-300 transition-colors"
+              title="Copy to clipboard"
+            >
+              📋
+            </button>
+          </div>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
-          Add New
-        </button>
       </div>
       {submitStatus && (
         <div className={`mb-4 p-4 rounded-md ${submitStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
@@ -930,6 +950,7 @@ function RegulaDevices() {
                 />
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name Device</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Birth Date</th>
@@ -960,6 +981,9 @@ function RegulaDevices() {
                   <div className="flex items-center space-x-2">
                     <span>{regula.id}</span>
                   </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {regula.name || '-'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {(() => {
@@ -1008,6 +1032,7 @@ export default function DevicesPage() {
   const location = useLocation();
   const isRegulaTab = location.pathname === '/devices/regula' || location.pathname === '/devices' || location.pathname === '/';
   const isRfidTab = location.pathname === '/devices/rfid';
+  
 
   return (
     <div className="p-6">
