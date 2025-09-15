@@ -10,6 +10,7 @@ interface RfidDevice {
   empty_card_bin: boolean;
   error_card_bin_full: boolean;
   pre_empty_card_bin: boolean;
+  delayed_response: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -21,6 +22,7 @@ interface CreateRfidDeviceDto {
   empty_card_bin: boolean;
   error_card_bin_full: boolean;
   pre_empty_card_bin: boolean;
+  delayed_response: number | null;
 }
 
 export default function RfidDevicesPage() {
@@ -34,7 +36,8 @@ export default function RfidDevicesPage() {
     clip_card: false,
     empty_card_bin: false,
     error_card_bin_full: false,
-    pre_empty_card_bin: false
+    pre_empty_card_bin: false,
+    delayed_response: null
   });
   const [isCreating, setIsCreating] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -86,7 +89,8 @@ export default function RfidDevicesPage() {
       clip_card: device.clip_card,
       empty_card_bin: device.empty_card_bin,
       error_card_bin_full: device.error_card_bin_full,
-      pre_empty_card_bin: device.pre_empty_card_bin
+      pre_empty_card_bin: device.pre_empty_card_bin,
+      delayed_response: device.delayed_response
     });
   };
 
@@ -223,7 +227,8 @@ export default function RfidDevicesPage() {
         clip_card: false,
         empty_card_bin: false,
         error_card_bin_full: false,
-        pre_empty_card_bin: false
+        pre_empty_card_bin: false,
+        delayed_response: null
       });
     } catch (err) {
       showToast('Failed to create device. Please try again.');
@@ -501,6 +506,25 @@ export default function RfidDevicesPage() {
                 </label>
               </div>
               
+              <div>
+                <label htmlFor="delayed_response" className="block text-sm font-medium text-gray-700 mb-1">
+                  Delayed Response (ms)
+                </label>
+                <input
+                  id="delayed_response"
+                  name="delayed_response"
+                  type="number"
+                  min="0"
+                  value={newDevice.delayed_response || ''}
+                  onChange={(e) => setNewDevice(prev => ({
+                    ...prev,
+                    delayed_response: e.target.value ? parseInt(e.target.value) : null
+                  }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter delay in milliseconds"
+                />
+              </div>
+              
               <div className="flex justify-end space-x-2 pt-4">
                 <button 
                   type="button"
@@ -542,8 +566,15 @@ export default function RfidDevicesPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Clip Card</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empty Bin</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bin Full</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pre-Empty</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Pre Empty Card Bin
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Delayed Response (ms)
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -647,18 +678,16 @@ export default function RfidDevicesPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editingId === device.id ? (
                         <input
-                          type="checkbox"
-                          name="pre_empty_card_bin"
-                          checked={editFormData?.pre_empty_card_bin || false}
+                          type="number"
+                          name="delayed_response"
+                          value={editFormData?.delayed_response || ''}
                           onChange={handleEditInputChange}
-                          className="h-4 w-4 text-blue-600 rounded"
+                          className="w-24 px-2 py-1 border rounded"
+                          placeholder="ms"
+                          min="0"
                         />
                       ) : (
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          device.pre_empty_card_bin ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {device.pre_empty_card_bin ? 'Yes' : 'No'}
-                        </span>
+                        <span className="text-sm text-gray-500">{device.delayed_response || '-'}</span>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

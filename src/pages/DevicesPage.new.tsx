@@ -28,6 +28,7 @@ interface Regula {
   birth_place: string;
   gender: string;
   photo_id: number | null;
+  delayed_response: number | null;
   created_at: string;
   updated_at: string;
   photo: Photo | null;
@@ -215,6 +216,7 @@ const DevicesPage = () => {
                 birth_place: '',
                 gender: 'male',
                 photo_id: null,
+                delayed_response: null,
               }}
               onInputChange={(e) => {
                 const { name, value } = e.target;

@@ -26,6 +26,7 @@ export interface Regula {
   birth_place: string;
   gender: string;
   photo_id: number | null;
+  delayed_response: number | null;
   created_at: string;
   updated_at: string;
   photo: Photo | null;
@@ -40,7 +41,6 @@ const RegulaDevices = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoadingPhotos, setIsLoadingPhotos] = useState(false);
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [isDeleting, setIsDeleting] = useState<number | null>(null);
   const { showToast } = useToast();
 
   const [formData, setFormData] = useState<{
@@ -57,6 +57,7 @@ const RegulaDevices = () => {
     birth_place: string;
     gender: string;
     photo_id: number | null;
+    delayed_response: number | null;
   }>({
     name: '',
     last_name: '',
@@ -71,6 +72,7 @@ const RegulaDevices = () => {
     birth_place: '',
     gender: 'M',
     photo_id: null,
+    delayed_response: null,
   });
 
   const BACKEND_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
@@ -132,6 +134,7 @@ const RegulaDevices = () => {
       birth_place: regula.birth_place,
       gender: regula.gender,
       photo_id: regula.photo_id,
+      delayed_response: regula.delayed_response,
     });
     setIsEditMode(true);
     setIsModalOpen(true);
@@ -141,7 +144,6 @@ const RegulaDevices = () => {
     if (!window.confirm('Are you sure you want to delete this record?')) return;
     
     try {
-      setIsDeleting(id);
       const response = await fetch(`${API_URL}/${id}`, {
         method: 'DELETE',
       });
@@ -153,8 +155,6 @@ const RegulaDevices = () => {
     } catch (error) {
       console.error('Error deleting data:', error);
       showToast('Failed to delete record', 'error');
-    } finally {
-      setIsDeleting(null);
     }
   };
 
@@ -173,6 +173,7 @@ const RegulaDevices = () => {
       birth_place: '',
       gender: 'M',
       photo_id: null,
+      delayed_response: null,
     });
     setSelectedRegula(null);
     setIsEditMode(false);
@@ -215,9 +216,10 @@ const RegulaDevices = () => {
         <table className="min-w-full bg-white">
           <thead>
             <tr className="bg-gray-100">
-              <th className="py-2 px-4 border">Name</th>
+              <th className="py-2 px-4 border">Full Name</th>
               <th className="py-2 px-4 border">Passport</th>
               <th className="py-2 px-4 border">Birth Date</th>
+              <th className="py-2 px-4 border">Delayed Response (ms)</th>
               <th className="py-2 px-4 border">Actions</th>
             </tr>
           </thead>
@@ -227,29 +229,27 @@ const RegulaDevices = () => {
                 <tr key={regula.id} className="hover:bg-gray-50">
                   <td className="py-2 px-4 border">{`${regula.last_name} ${regula.first_name} ${regula.middle_name}`}</td>
                   <td className="py-2 px-4 border">{`${regula.series} ${regula.number}`}</td>
-                  <td className="py-2 px-4 border">{new Date(regula.birth_date).toLocaleDateString()}</td>
+                  <td className="py-2 px-4 border">{regula.birth_date}</td>
+                  <td className="py-2 px-4 border">{regula.delayed_response || '-'}</td>
                   <td className="py-2 px-4 border">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleEdit(regula)}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(regula.id)}
-                        disabled={isDeleting === regula.id}
-                        className="text-red-600 hover:text-red-800 disabled:opacity-50"
-                      >
-                        {isDeleting === regula.id ? 'Deleting...' : 'Delete'}
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => handleEdit(regula)}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(regula.id)}
+                      className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="py-4 text-center text-gray-500">
+                <td colSpan={5} className="py-2 px-4 border text-center">
                   No records found
                 </td>
               </tr>
