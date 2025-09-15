@@ -26,6 +26,7 @@ interface PassportFormData {
   birth_place: string;
   gender: string;
   photo_id: number | null;
+  delayed_response: number | null;
 }
 
 interface PhotoUploadData {
@@ -47,10 +48,11 @@ const initialFormData: PassportFormData = {
   issued_by: '',
   birth_place: '',
   gender: 'm',
-  photo_id: 0
+  photo_id: 0,
+  delayed_response: null
 };
 
-const BACKEND_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
+const BACKEND_URL = `${window.location.protocol}//${window.location.hostname}:8001`;
 
 interface PassportFormProps {
   isOpen: boolean;
@@ -183,7 +185,8 @@ const PassportForm = ({
       issued_by: 'Отделом УФМС по городу ' + cities[Math.floor(Math.random() * cities.length)],
       birth_place: 'г. ' + cities[Math.floor(Math.random() * cities.length)],
       gender: gender,
-      photo_id: photos.length > 0 ? photos[Math.floor(Math.random() * photos.length)].id : null
+      photo_id: photos.length > 0 ? photos[Math.floor(Math.random() * photos.length)].id : null,
+      delayed_response: Math.random() > 0.5 ? Math.floor(Math.random() * 10) : null
     };
     
     setFormData(randomData);
@@ -436,6 +439,24 @@ const PassportForm = ({
             <option value="female">Female</option>
           </select>
         </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Delayed Response (seconds)</label>
+          <input
+            type="number"
+            name="delayed_response"
+            value={formData.delayed_response ?? ''}
+            onChange={(e) => {
+              const value = e.target.value ? parseInt(e.target.value, 10) : null;
+              setFormData(prev => ({
+                ...prev,
+                delayed_response: isNaN(value as number) ? null : value
+              }));
+            }}
+            min="0"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            placeholder="Enter delay in seconds"
+          />
+        </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-2">Photo</label>
           
@@ -589,6 +610,7 @@ interface Regula {
   birth_place: string;
   gender: string;
   photo_id: number | null;
+  delayed_response: number | null;
   created_at: string;
   updated_at: string;
   photo: Photo | null;
@@ -598,6 +620,7 @@ interface Regula {
 
 // Use the current hostname and port 8000 for the API
 const API_URL = `${window.location.protocol}//${window.location.hostname}:8000/api/v1/regula`;
+
 const PHOTOS_API_URL = `${API_URL}/photos`;
 const PHOTO_API_URL = `${API_URL}/photo`;
 
@@ -774,7 +797,8 @@ function RegulaDevices() {
       issued_by: regula.issued_by || '',
       birth_place: regula.birth_place || '',
       gender: regula.gender || 'm',
-      photo_id: regula.photo_id || null
+      photo_id: regula.photo_id || null,
+      delayed_response: regula.delayed_response || null
     });
     
     setEditingRegula(regula);
@@ -955,6 +979,7 @@ function RegulaDevices() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Birth Date</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Document</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delayed Response (s)</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
             </tr>
           </thead>
@@ -1015,6 +1040,9 @@ function RegulaDevices() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {regula.series} {regula.number}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {regula.delayed_response ?? '-'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {formatDate(regula.created_at)}

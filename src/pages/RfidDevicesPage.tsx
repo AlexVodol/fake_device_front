@@ -508,7 +508,7 @@ export default function RfidDevicesPage() {
               
               <div>
                 <label htmlFor="delayed_response" className="block text-sm font-medium text-gray-700 mb-1">
-                  Delayed Response (ms)
+                  Delayed Response (seconds)
                 </label>
                 <input
                   id="delayed_response"
@@ -521,7 +521,7 @@ export default function RfidDevicesPage() {
                     delayed_response: e.target.value ? parseInt(e.target.value) : null
                   }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter delay in milliseconds"
+                  placeholder="Enter delay in seconds"
                 />
               </div>
               
@@ -570,7 +570,7 @@ export default function RfidDevicesPage() {
                   Pre Empty Card Bin
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Delayed Response (ms)
+                  Delayed Response (s)
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -672,6 +672,23 @@ export default function RfidDevicesPage() {
                           device.error_card_bin_full ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
                         }`}>
                           {device.error_card_bin_full ? 'Yes' : 'No'}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {editingId === device.id ? (
+                        <input
+                          type="checkbox"
+                          name="pre_empty_card_bin"
+                          checked={editFormData?.pre_empty_card_bin || false}
+                          onChange={handleEditInputChange}
+                          className="h-4 w-4 text-blue-600 rounded"
+                        />
+                      ) : (
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          device.pre_empty_card_bin ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {device.pre_empty_card_bin ? 'Yes' : 'No'}
                         </span>
                       )}
                     </td>
