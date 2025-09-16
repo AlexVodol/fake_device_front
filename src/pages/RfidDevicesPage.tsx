@@ -6,6 +6,7 @@ interface RfidDevice {
   id: number;
   name: string;
   rfid: string;
+  number_cards: number;
   clip_card: boolean;
   empty_card_bin: boolean;
   error_card_bin_full: boolean;
@@ -597,6 +598,9 @@ export default function RfidDevicesPage() {
                 </th>
                 <th className="border-r border-gray-200"></th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Number of Cards
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Delayed Response (s)
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -720,6 +724,9 @@ export default function RfidDevicesPage() {
                       )}
                     </td>
                     <td className="border-r border-gray-200"></td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                      {device.number_cards !== undefined ? device.number_cards : 0}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {editingId === device.id ? (
                         <input
