@@ -16,7 +16,7 @@ const Header = () => {
             </li>
             <li>
               <a 
-                href="http://localhost:8000/api/docs#/" 
+                href={`${window.location.protocol}//${window.location.hostname}:8000/api/docs#/`}
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"

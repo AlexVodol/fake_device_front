@@ -108,11 +108,37 @@ export default function RfidDevicesPage() {
     }));
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text).then(
-      () => showToast('URL has been copied to clipboard!'),
-      () => showToast('Failed to copy URL. Please copy it manually.')
-    );
+  const copyToClipboard = async (text: string) => {
+    try {
+      // Modern async approach
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        showToast('Copied to clipboard!');
+        return;
+      }
+      
+      // Fallback for non-secure contexts
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';  // Avoid scrolling to bottom
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          showToast('Copied to clipboard!');
+        } else {
+          throw new Error('Failed to copy');
+        }
+      } finally {
+        document.body.removeChild(textArea);
+      }
+    } catch (err) {
+      console.error('Failed to copy text:', err);
+      showToast('Failed to copy. Please copy manually.', 'error');
+    }
   };
 
   const generateRandomData = () => {
@@ -387,7 +413,7 @@ export default function RfidDevicesPage() {
         <div className="mb-4">
           <p className="text-gray-600">To use the device, use a URL: </p>
           <div className="flex items-center bg-gray-100 rounded overflow-hidden mt-1">
-            <code className="px-2 py-1">http://localhost:8000/api/v1/fake_rfid/&#123;rfid_id&#125;/</code>
+             <code className="px-2 py-1">{window.location.protocol}//{window.location.hostname}:8000/api/v1/fake_rfid/&#123;id_rfid&#125;/</code>
             <button 
               onClick={() => copyToClipboard('http://localhost:8000/api/v1/fake_rfid/{rfid_id}/')}
               className="px-2 py-1 bg-gray-200 hover:bg-gray-300 transition-colors"
@@ -569,6 +595,7 @@ export default function RfidDevicesPage() {
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Pre Empty Card Bin
                 </th>
+                <th className="border-r border-gray-200"></th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Delayed Response (s)
                 </th>
@@ -692,7 +719,8 @@ export default function RfidDevicesPage() {
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="border-r border-gray-200"></td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {editingId === device.id ? (
                         <input
                           type="number"
@@ -704,7 +732,7 @@ export default function RfidDevicesPage() {
                           min="0"
                         />
                       ) : (
-                        <span className="text-sm text-gray-500">{device.delayed_response || '-'}</span>
+                        <span className="text-sm text-gray-500">{device.delayed_response !== null ? device.delayed_response : '-'}</span>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
